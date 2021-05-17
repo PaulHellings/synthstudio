@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    Synths and cats are cool
+    <span>Synths and cats are cool</span>
     <gear-grid></gear-grid>
   </v-container>
 </template>
