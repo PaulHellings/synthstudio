@@ -2,7 +2,7 @@
   <nav>
     <v-app-bar flat>
       <v-toolbar-title class="text-uppercase grey--text text--darken-1">
-        <v-avatar size="30" class="mr-3">
+        <v-avatar size="30" class="mr-3 mt-n1">
           <img alt="synth-logo" class="img-black-white" src="../assets/rev2.png"/>
         </v-avatar>
         <span class="font-weight-light">synth</span>
