@@ -1,17 +1,27 @@
 <template>
+  <div>
+<!--    <v-text-field-->
+<!--        v-model="search"-->
+<!--        label="Search"-->
+<!--    ></v-text-field>-->
   <v-data-table
       :headers="headers"
       :items="gear"
+      :search="search"
       class="elevation-1"
   ></v-data-table>
+  </div>
 </template>
 
 <script>
+import db from '@/fb.js';
+
 export default {
   name: 'GearGrid',
 
   data() {
     return {
+      search: "",
       headers: [
         {
           text: 'Model',
@@ -26,39 +36,20 @@ export default {
           value: 'type',
         },
       ],
-      gear: [
-        {
-          id: 1,
-          type: 'synthesizer',
-          model: 'Virus',
-          brand: 'Access',
-        },
-        {
-          id: 2,
-          type: 'synthesizer',
-          model: 'Streichfett',
-          brand: 'Waldorf',
-        },
-        {
-          id: 3,
-          type: 'drummachine',
-          model: 'Analog Rytm',
-          brand: 'Elektron',
-        },
-        {
-          id: 4,
-          type: 'drummachine',
-          model: 'RD-8',
-          brand: 'Behringer',
-        },
-        {
-          id: 5,
-          type: 'synthesizer',
-          model: 'Quasar',
-          brand: 'Quasimidi',
-        },
-      ],
+      gear: [],
     };
+  },
+
+  methods: {
+    async getGearData() {
+      // TODO: add loader
+      const gear = await db.collection('gear').get();
+      this.gear = gear.docs.map(doc => doc.data());
+    },
+  },
+
+  mounted() {
+    this.getGearData();
   },
 };
 </script>
