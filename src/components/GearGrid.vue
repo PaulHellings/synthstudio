@@ -1,27 +1,40 @@
 <template>
   <div>
-<!--    <v-text-field-->
-<!--        v-model="search"-->
-<!--        label="Search"-->
-<!--    ></v-text-field>-->
-  <v-data-table
-      :headers="headers"
-      :items="gear"
-      :search="search"
-      class="elevation-1"
-  ></v-data-table>
+    <v-data-table
+        :headers="headers"
+        :items="$store.state.gear"
+        class="elevation-1"
+    >
+      <template v-slot:item.actions="{ item }">
+        <v-btn icon>
+          <v-icon @click="$emit('edit', item)"
+              small>
+            mdi-eye
+          </v-icon>
+        </v-btn>
+
+        <v-btn icon>
+          <v-icon color="red" class="text--lighten-2" @click="$emit('delete', item)"
+                  small>
+            mdi-delete
+          </v-icon>
+        </v-btn>
+
+      </template>
+    </v-data-table>
   </div>
 </template>
 
 <script>
-import db from '@/fb.js';
 
 export default {
   name: 'GearGrid',
 
   data() {
     return {
-      search: "",
+      // gear to show
+      gear: [],
+      // data grid header config
       headers: [
         {
           text: 'Model',
@@ -35,21 +48,21 @@ export default {
           text: 'Type',
           value: 'type',
         },
+        {
+          text: '',
+          value: 'actions',
+          sortable: false,
+          align:'right'
+        },
       ],
-      gear: [],
     };
   },
 
-  methods: {
-    async getGearData() {
-      // TODO: add loader
-      const gear = await db.collection('gear').get();
-      this.gear = gear.docs.map(doc => doc.data());
-    },
-  },
+  methods: {},
 
-  mounted() {
-    this.getGearData();
+  created() {
+    // get data
+    this.$store.dispatch('asyncGetGear');
   },
 };
 </script>

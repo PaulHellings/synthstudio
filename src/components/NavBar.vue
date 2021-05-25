@@ -10,21 +10,32 @@
       </v-toolbar-title>
       <v-spacer/>
       <v-toolbar-items v-for="navItem in navItems" :key="navItem.name">
-        <v-btn text :to="navItem.route" class="grey--text text--darken-1">
+        <v-btn v-if="navItem.name !== 'Login' || (navItem.name === 'Login' && !isLoggedIn)"
+               text
+               :to="navItem.route"
+               class="grey--text text--darken-1">
           <v-icon left>mdi-{{ navItem.icon }}</v-icon>
           {{ navItem.name }}
         </v-btn>
       </v-toolbar-items>
+      <v-btn v-if="isLoggedIn" text @click="logout">
+        <v-icon left>mdi-logout</v-icon>
+        logout
+      </v-btn>
     </v-app-bar>
   </nav>
 </template>
 
 <script>
+import firebase from 'firebase/app';
+import 'firebase/auth';
+
 export default {
   name: 'NavBar',
 
   data() {
     return {
+      isLoggedIn: false,
       navItems: [
         {
           name: 'Home',
@@ -36,8 +47,31 @@ export default {
           icon: 'bookmark-music',
           route: '/bookmarks',
         },
+        {
+          name: 'Login',
+          icon: 'login',
+          route: '/login',
+        },
       ],
     };
+  },
+
+  methods: {
+    logout() {
+      firebase.auth().signOut()
+          .then(() => {
+            this.$router.go({ path: this.$router.path });
+
+          });
+    },
+  },
+
+  created() {
+    if (firebase.auth().currentUser) {
+      this.isLoggedIn = true;
+    } else {
+      this.isLoggedIn = false;
+    }
   },
 };
 </script>

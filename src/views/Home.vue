@@ -3,12 +3,12 @@
     <v-row>
       <v-col class="d-flex">
         <v-spacer></v-spacer>
-        <v-btn @click="openDlgNewGearItem">Add item</v-btn>
+        <v-btn @click="openDlgGearItem(null)">Add item</v-btn>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        <gear-grid ref="gearDataGrid"></gear-grid>
+        <gear-grid ref="gearDataGrid" @edit="openDlgGearItem" @delete="onDeleteClick"></gear-grid>
       </v-col>
     </v-row>
 
@@ -18,28 +18,28 @@
         width="500">
       <v-card>
         <v-card-title>
-          Add a new item to your gear list
+          Gear item
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-          <v-form ref="frmNewGearItem" v-model="newGearItemValid">
+          <v-form ref="frmGearItem" v-model="gearItemValid">
             <!-- brand -->
             <v-text-field
-                v-model="newGearItem.brand"
+                v-model="gearItem.brand"
                 label="Brand"
                 required
                 :rules="[v => !!v || 'Please enter a brand']"
             ></v-text-field>
             <!-- model -->
             <v-text-field
-                v-model="newGearItem.model"
+                v-model="gearItem.model"
                 label="Model"
                 required
                 :rules="[v => !!v || 'Please enter a model']"
             ></v-text-field>
             <!-- type -->
             <v-radio-group
-                v-model="newGearItem.type"
+                v-model="gearItem.type"
                 mandatory>
               <template v-slot:label>
                 <div class="text-subtitle-1">Type of gear</div>
@@ -59,7 +59,7 @@
             </v-radio-group>
             <!-- technology -->
             <v-radio-group
-                v-model="newGearItem.technology"
+                v-model="gearItem.technology"
                 mandatory>
               <template v-slot:label>
                 <div class="text-subtitle-1">Technology used</div>
@@ -82,7 +82,7 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer/>
-          <v-btn class="primary" :disabled="!newGearItemValid" @click="saveNewGearItem">Save</v-btn>
+          <v-btn class="primary" :disabled="!gearItemValid" @click="onSaveClick">Save</v-btn>
           <v-btn text @click="dlgAddGearItem = false">Cancel</v-btn>
         </v-card-actions>
       </v-card>
@@ -102,29 +102,78 @@ export default {
   data() {
     return {
       dlgAddGearItem: false,
-      newGearItemValid: false,
-      newGearItem: this.getNewGearItemTemplate(),
+      gearItemValid: false,
+      gearItem: this.getNewGearItemTemplate(),
     };
   },
 
   methods: {
-    openDlgNewGearItem() {
-      this.newGearItem = this.getNewGearItemTemplate();
-      if (this.$refs.frmNewGearItem) this.$refs.frmNewGearItem.reset();
-      this.dlgAddGearItem = true;
+    openDlgGearItem(item) {
+      if (this.$refs.frmGearItem) this.$refs.frmGearItem.reset();
+      // next tick so resetting form is complete
+      this.$nextTick(() => {
+        // set item to edit, or create new one if applicable
+        this.gearItem = item ? JSON.parse(JSON.stringify(item)) : this.getNewGearItemTemplate();
+        this.dlgAddGearItem = true;
+      });
+    },
+
+    onSaveClick() {
+      // TODO: add loader
+      if (this.gearItemValid) {
+        if (this.gearItem.id) {
+          // exists so save edits
+          this.updateGearItem();
+        } else {
+          // does not exist, save as new
+          this.saveNewGearItem();
+        }
+      }
     },
 
     saveNewGearItem() {
-      // TODO: check if exists
-      // TODO: add loader
-      if (this.newGearItemValid) {
-        this.newGearItem.added = new Date();
-        db.collection('gear').add(this.newGearItem).then((response) => {
-          console.log(response);
-          console.log('added to db');
-          this.$refs.gearDataGrid.getGearData();
-          this.dlgAddGearItem = false;
-        });
+      // add 'added' prop
+      this.gearItem.added = new Date();
+      // save to db
+      db.collection('gear').add(this.gearItem).then(() => {
+        this.$store.dispatch('asyncGetGear');
+        this.dlgAddGearItem = false;
+      }).catch((error) => {
+        console.log('Error adding new gear: ', error);
+      });
+    },
+
+    updateGearItem() {
+      db.collection('gear').doc(this.gearItem.id).get()
+          .then(doc => {
+            if (doc.exists) {
+              doc.ref.update(this.gearItem)
+                  .then(() => {
+                    this.$store.dispatch('asyncGetGear');
+                    this.dlgAddGearItem = false;
+                  });
+            }
+          })
+          .catch((error) => {
+            console.log('Error deleting gear ', error);
+          });
+    },
+
+    // TODO: delete via vuetify confirm dialog instead of browsers own
+    onDeleteClick(item) {
+      if (confirm(`Are you sure you want to delete ${item.model}`)) {
+        db.collection('gear').doc(item.id).get()
+            .then(doc => {
+              if (doc.exists) {
+                doc.ref.delete()
+                    .then(() => {
+                      this.$store.dispatch('asyncGetGear');
+                    });
+              }
+            })
+            .catch((error) => {
+              console.log('Error deleting gear ', error);
+            });
       }
     },
 
