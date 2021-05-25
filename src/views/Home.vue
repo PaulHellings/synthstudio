@@ -22,6 +22,7 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
+          <image-upload ref="imageUpload" v-if="dlgAddGearItem" class="my-6"></image-upload>
           <v-form ref="frmGearItem" v-model="gearItemValid">
             <!-- brand -->
             <v-text-field
@@ -96,6 +97,7 @@
 
 import GearGrid from '@/components/GearGrid.vue';
 import db from '@/fb.js';
+import ImageUpload from '@/components/ImageUpload.vue';
 
 export default {
   name: 'Home',
@@ -131,7 +133,14 @@ export default {
       }
     },
 
-    saveNewGearItem() {
+    // initiate image upload and set url if applicable
+    async getImageUrlFromUpload(){
+      const imageUrl = await this.$refs.imageUpload.uploadImage();
+      if (imageUrl) this.gearItem.url = imageUrl;
+    },
+
+    async saveNewGearItem() {
+     await this.getImageUrlFromUpload();
       // add 'added' prop
       this.gearItem.added = new Date();
       // save to db
@@ -143,7 +152,8 @@ export default {
       });
     },
 
-    updateGearItem() {
+    async updateGearItem() {
+      await this.getImageUrlFromUpload();
       db.collection('gear').doc(this.gearItem.id).get()
           .then(doc => {
             if (doc.exists) {
@@ -188,6 +198,9 @@ export default {
     },
   },
 
-  components: { GearGrid },
+  components: {
+    ImageUpload,
+    GearGrid,
+  },
 };
 </script>

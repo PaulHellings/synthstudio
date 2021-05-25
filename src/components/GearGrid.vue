@@ -5,6 +5,11 @@
         :items="$store.state.gear"
         class="elevation-1"
     >
+      <template v-slot:item.url="{ item} ">
+        <v-avatar v-if="item.url" size="30" class="" >
+          <img alt="synth-image" :src="item.url"/>
+        </v-avatar>
+      </template>
       <template v-slot:item.actions="{ item }">
         <v-btn icon>
           <v-icon @click="$emit('edit', item)"
@@ -36,6 +41,11 @@ export default {
       gear: [],
       // data grid header config
       headers: [
+        {
+          text:'',
+          value:'url',
+          width:'40px'
+        },
         {
           text: 'Model',
           value: 'model',

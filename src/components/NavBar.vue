@@ -18,7 +18,7 @@
           {{ navItem.name }}
         </v-btn>
       </v-toolbar-items>
-      <v-btn v-if="isLoggedIn" text @click="logout">
+      <v-btn class="grey--text text--darken-1" v-if="isLoggedIn" text @click="logout">
         <v-icon left>mdi-logout</v-icon>
         logout
       </v-btn>
@@ -67,11 +67,7 @@ export default {
   },
 
   created() {
-    if (firebase.auth().currentUser) {
-      this.isLoggedIn = true;
-    } else {
-      this.isLoggedIn = false;
-    }
+    this.isLoggedIn = !!firebase.auth().currentUser;
   },
 };
 </script>
