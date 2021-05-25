@@ -6,7 +6,7 @@
         class="elevation-1"
     >
       <template v-slot:item.url="{ item} ">
-        <v-avatar v-if="item.url" size="30" class="" >
+        <v-avatar v-if="item.url" size="30" class="lighten-1" color="grey">
           <img alt="synth-image" :src="item.url"/>
         </v-avatar>
       </template>

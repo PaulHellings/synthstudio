@@ -6,17 +6,17 @@
             @dragover.prevent="dragover = true"
             @dragenter.prevent="dragover = true"
             @dragleave.prevent="dragover = false"
-            :class="{ 'grey lighten-2': dragover, 'drop-zone' : !uploadedImage }">
+            :class="{ 'grey lighten-2': dragover, 'drop-zone' : !uploadedImage && !existingImgUrl }">
       <v-card-actions>
         <v-spacer></v-spacer>
         <!-- remove image button-->
-        <v-btn v-if="uploadedImage" icon @click="uploadedImage = null">
+        <v-btn v-if="uploadedImage || existingImgUrl" icon @click="onResetImageClick">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-actions>
       <v-card-text class="mt-0">
         <!--dropzone -->
-        <v-row v-if="!imageUrl"
+        <v-row v-if="!imageUrl && !existingImgUrl"
                class="d-flex flex-column"
                dense
                align="center"
@@ -30,6 +30,7 @@
         <!-- hidden input for upload via click -->
         <v-file-input ref="uploadInput" v-show="false" accept="image/*" @change="onFileSelected"></v-file-input>
         <v-img v-if="imageUrl" :src="imageUrl" max-height="200px" contain></v-img>
+        <v-img v-else-if="existingImgUrl" :src="existingImgUrl" max-height="200px" contain></v-img>
       </v-card-text>
     </v-card>
     <v-progress-linear class="my-3" v-if="progress > 0" :value="progress"></v-progress-linear>
@@ -42,6 +43,10 @@ import 'firebase/storage';
 
 export default {
   name: 'ImageUpload',
+
+  props: {
+    existingImgUrl: { type: String },
+  },
 
   data() {
     return {
@@ -103,6 +108,11 @@ export default {
         }
       });
     },
+
+    onResetImageClick(){
+      this.uploadedImage = null;
+      this.$emit('update:existingImgUrl', null)
+    }
   },
 };
 </script>

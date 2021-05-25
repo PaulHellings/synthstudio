@@ -22,7 +22,7 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-          <image-upload ref="imageUpload" v-if="dlgAddGearItem" class="my-6"></image-upload>
+          <image-upload ref="imageUpload" v-if="dlgAddGearItem" :existing-img-url.sync="gearItem.url" class="my-6"></image-upload>
           <v-form ref="frmGearItem" v-model="gearItemValid">
             <!-- brand -->
             <v-text-field
