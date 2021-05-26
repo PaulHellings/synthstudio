@@ -6,26 +6,47 @@
         class="elevation-1"
     >
       <template v-slot:item.url="{ item} ">
-        <v-avatar v-if="item.url" size="30" class="lighten-1" color="grey">
+        <v-avatar v-if="item.url"
+                  :size="avatarSize"
+                  class="lighten-1"
+                  :class="{ 'my-5':  $vuetify.breakpoint.xs }"
+                  color="grey">
           <img alt="synth-image" :src="item.url"/>
         </v-avatar>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn icon>
+        <!-- normal button -->
+        <v-btn icon class="d-none d-sm-inline-block">
           <v-icon @click="$emit('edit', item)"
                   small>
-            mdi-eye
+            mdi-pencil
           </v-icon>
         </v-btn>
-
-        <v-btn icon>
+        <!-- mobile button -->
+        <v-btn class="d-sm-none mr-3" elevation="0">
+          <v-icon left @click="$emit('edit', item)"
+                  small>
+            mdi-pencil
+          </v-icon>
+          Edit
+        </v-btn>
+        <!-- normal button -->
+        <v-btn icon class="d-none d-sm-inline-block">
           <v-icon color="red"
                   class="text--lighten-2"
                   @click="$emit('delete', item)"
                   small>mdi-delete
           </v-icon>
         </v-btn>
-
+        <!-- mobile button -->
+        <v-btn color="error" class="d-sm-none" elevation="0">
+          <v-icon left
+                  class="text--lighten-2"
+                  @click="$emit('delete', item)"
+                  small>mdi-delete
+          </v-icon>
+          Delete
+        </v-btn>
       </template>
     </v-data-table>
   </div>
@@ -45,6 +66,7 @@ export default {
           text: '',
           value: 'url',
           width: '40px',
+          align: 'center',
         },
         {
           text: 'Model',
@@ -79,6 +101,10 @@ export default {
         return this.headers.filter(headerItem => headerItem.value !== 'actions');
       }
     },
+
+    avatarSize() {
+      return this.$vuetify.breakpoint.smAndUp ? '30' : '150';
+    },
   },
 
   methods: {},
@@ -91,5 +117,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

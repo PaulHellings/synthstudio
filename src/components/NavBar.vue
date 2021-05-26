@@ -70,6 +70,14 @@ export default {
       if (this.$route.name !== 'Home') this.$router.push({ name: 'Home' });
     },
   },
+
+  created() {
+    // TODO: remove breakpoint helper
+    let vm = this;
+    window.onresize = function () {
+      console.log(vm.$vuetify.breakpoint.name);
+    };
+  },
 };
 </script>
 
