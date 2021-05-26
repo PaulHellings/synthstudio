@@ -3,7 +3,7 @@
 ## Firebase
 If you'd like to try out this project, make sure you add you own
 firebase config keys in the file `src/fb.js`. You'll also need to
-configure the following rules two rule sets for firestore and storage.
+configure the following two rule sets for firestore and storage.
 
 ### Firestore rules
 Configure email and password authentication. For this project I added
