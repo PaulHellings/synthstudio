@@ -51,7 +51,7 @@ export default {
     login() {
       firebase.auth().signInWithEmailAndPassword(this.email, this.password)
           .then(() => {
-                this.$router.go({ path: this.$router.path });
+                this.$router.push({ name: 'Home' });
               },
               err => {
                 console.log(err);

@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-data-table
-        :headers="headers"
-        :items="$store.state.gear"
+        :headers="headersToShow"
+        :items="gear"
         class="elevation-1"
     >
       <template v-slot:item.url="{ item} ">
@@ -13,15 +13,16 @@
       <template v-slot:item.actions="{ item }">
         <v-btn icon>
           <v-icon @click="$emit('edit', item)"
-              small>
+                  small>
             mdi-eye
           </v-icon>
         </v-btn>
 
         <v-btn icon>
-          <v-icon color="red" class="text--lighten-2" @click="$emit('delete', item)"
-                  small>
-            mdi-delete
+          <v-icon color="red"
+                  class="text--lighten-2"
+                  @click="$emit('delete', item)"
+                  small>mdi-delete
           </v-icon>
         </v-btn>
 
@@ -31,20 +32,19 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 
 export default {
   name: 'GearGrid',
 
   data() {
     return {
-      // gear to show
-      gear: [],
       // data grid header config
       headers: [
         {
-          text:'',
-          value:'url',
-          width:'40px'
+          text: '',
+          value: 'url',
+          width: '40px',
         },
         {
           text: 'Model',
@@ -62,10 +62,23 @@ export default {
           text: '',
           value: 'actions',
           sortable: false,
-          align:'right'
+          align: 'right',
+          width: '110px',
         },
       ],
     };
+  },
+
+  computed: {
+    ...mapState(['loggedIn', 'gear']),
+
+    headersToShow() {
+      if (this.loggedIn) {
+        return this.headers;
+      } else {
+        return this.headers.filter(headerItem => headerItem.value !== 'actions');
+      }
+    },
   },
 
   methods: {},

@@ -3,7 +3,7 @@
     <v-row>
       <v-col class="d-flex">
         <v-spacer></v-spacer>
-        <v-btn @click="openDlgGearItem(null)">Add item</v-btn>
+        <v-btn v-if="loggedIn" @click="openDlgGearItem(null)">Add item</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -22,7 +22,10 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
-          <image-upload ref="imageUpload" v-if="dlgAddGearItem" :existing-img-url.sync="gearItem.url" class="my-6"></image-upload>
+          <image-upload ref="imageUpload"
+                        v-if="dlgAddGearItem"
+                        :existing-img-url.sync="gearItem.url"
+                        class="my-6"></image-upload>
           <v-form ref="frmGearItem" v-model="gearItemValid">
             <!-- brand -->
             <v-text-field
@@ -98,6 +101,7 @@
 import GearGrid from '@/components/GearGrid.vue';
 import db from '@/fb.js';
 import ImageUpload from '@/components/ImageUpload.vue';
+import { mapState } from 'vuex';
 
 export default {
   name: 'Home',
@@ -107,6 +111,10 @@ export default {
       gearItemValid: false,
       gearItem: this.getNewGearItemTemplate(),
     };
+  },
+
+  computed: {
+    ...mapState(['loggedIn']),
   },
 
   methods: {
@@ -134,13 +142,13 @@ export default {
     },
 
     // initiate image upload and set url if applicable
-    async getImageUrlFromUpload(){
+    async getImageUrlFromUpload() {
       const imageUrl = await this.$refs.imageUpload.uploadImage();
       if (imageUrl) this.gearItem.url = imageUrl;
     },
 
     async saveNewGearItem() {
-     await this.getImageUrlFromUpload();
+      await this.getImageUrlFromUpload();
       // add 'added' prop
       this.gearItem.added = new Date();
       // save to db

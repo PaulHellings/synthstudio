@@ -3,5 +3,5 @@ module.exports = {
     'vuetify'
   ],
 
-  //publicPath: '/synths'
+  publicPath: '/synths'
 }
