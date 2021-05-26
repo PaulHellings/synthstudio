@@ -22,7 +22,7 @@ service cloud.firestore {
 }
 ```
 
-###Storage rules
+### Storage rules
 For storage I only added a rule that just one specific user can use
 storage. This is for the upload image functionality. Replace <your uid> with the 
 user uid you'd like to give access.
